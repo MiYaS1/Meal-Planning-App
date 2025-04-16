@@ -3,9 +3,31 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | MealPlanningApp</title>
+    <title>Unity WebGL Player | MealPlanningApp</title> <!-- 必要に応じて manifest.json と合わせる -->
+
+    <!-- PWA Manifest Link -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Theme Color for Browser UI -->
+    <meta name="theme-color" content="#4CAF50"> <!-- manifest.jsonのtheme_colorと合わせる (例: 緑色) -->
+
+    <!-- iOS Safari specific meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> <!-- or default, black -->
+    <meta name="apple-mobile-web-app-title" content="MealPlanApp"> <!-- manifest.jsonのshort_nameと合わせる -->
+
+    <!-- Add to home screen for Safari on iOS -->
+    <!-- アイコンへのリンク (パスを確認してください) -->
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <!-- <link rel="apple-touch-icon" sizes="512x512" href="images/icon-512x512.png"> --> <!-- 必要ならコメント解除 -->
+
+    <!-- Existing Favicon and Stylesheet -->
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+
+    <!-- Viewport meta tag (will be added dynamically for mobile below, but good to have a default) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
@@ -23,8 +45,9 @@
         <div id="unity-build-title">MealPlanningApp</div>
       </div>
     </div>
-    <script>
 
+    <!-- Unity Loader and Instantiation Script (Original) -->
+    <script>
       var container = document.querySelector("#unity-container");
       var canvas = document.querySelector("#unity-canvas");
       var loadingBar = document.querySelector("#unity-loading-bar");
@@ -32,12 +55,6 @@
       var fullscreenButton = document.querySelector("#unity-fullscreen-button");
       var warningBanner = document.querySelector("#unity-warning");
 
-      // Shows a temporary message banner/ribbon for a few seconds, or
-      // a permanent error message on top of the canvas if type=='error'.
-      // If type=='warning', a yellow highlight color is used.
-      // Modify or remove this function to customize the visually presented
-      // way that non-critical warnings and error messages are presented to the
-      // user.
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
           warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
@@ -57,43 +74,35 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/Unity-Meal-Planning-App.loader.js";
+      var loaderUrl = buildUrl + "/Unity-Meal-Planning-App.loader.js"; // Corrected file name based on initial request
       var config = {
-        dataUrl: buildUrl + "/Unity-Meal-Planning-App.data",
-        frameworkUrl: buildUrl + "/Unity-Meal-Planning-App.framework.js",
-        codeUrl: buildUrl + "/Unity-Meal-Planning-App.wasm",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "MealPlanningApp",
-        productVersion: "0.1",
+        dataUrl: buildUrl + "/Unity-Meal-Planning-App.data",       // Corrected file name
+        frameworkUrl: buildUrl + "/Unity-Meal-Planning-App.framework.js", // Corrected file name
+        codeUrl: buildUrl + "/Unity-Meal-Planning-App.wasm",     // Corrected file name
+        streamingAssetsUrl: "StreamingAssets", // This line was present in the original config
+        companyName: "DefaultCompany", // Keep or change as needed
+        productName: "MealPlanningApp",  // Keep or change as needed
+        productVersion: "0.1",       // Keep or change as needed
         showBanner: unityShowBanner,
       };
 
-      // By default, Unity keeps WebGL canvas render target size matched with
-      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
-      // Set this to false if you want to decouple this synchronization from
-      // happening inside the engine, and you would instead like to size up
-      // the canvas DOM size and WebGL render target sizes yourself.
-      // config.matchWebGLToCanvasSize = false;
-
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
+        // Remove existing viewport meta if any, before adding the mobile specific one
+        var existingMeta = document.querySelector('meta[name="viewport"]');
+        if (existingMeta) {
+            existingMeta.parentNode.removeChild(existingMeta);
+        }
 
         var meta = document.createElement('meta');
         meta.name = 'viewport';
+        // Note: shrink-to-fit=no is deprecated, use yes or remove it. Using yes for safety.
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
+
         container.className = "unity-mobile";
         canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-
+        // config.devicePixelRatio = 1; // Uncomment if needed for performance
       } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-
         canvas.style.width = "960px";
         canvas.style.height = "600px";
       }
@@ -105,18 +114,33 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-              }).then((unityInstance) => {
-                loadingBar.style.display = "none";
-                fullscreenButton.onclick = () => {
-                  unityInstance.SetFullscreen(1);
-                };
-              }).catch((message) => {
-                alert(message);
-              });
-            };
-
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+          fullscreenButton.onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+        }).catch((message) => {
+          alert(message);
+        });
+      };
       document.body.appendChild(script);
 
     </script>
+
+    <!-- Service Worker Registration Script -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js') // Path to your service worker file
+            .then(registration => {
+              console.log('Service Worker registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('Service Worker registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+
   </body>
 </html>
