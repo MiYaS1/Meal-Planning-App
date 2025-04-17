@@ -1,5 +1,5 @@
 // キャッシュ名 (バージョンが変わったらここを変更すると古いキャッシュが削除されます)
-const CACHE_NAME = 'unity-meal-planning-app-cache-v1';
+const CACHE_NAME = 'dietary-education-memory-game-cache-v1';
 
 // キャッシュするファイルのリスト
 // Unityのビルドファイル名は正確に指定してください
@@ -9,10 +9,10 @@ const urlsToCache = [
   'manifest.json',
   'images/icon-192x192.png', // パスを修正
   'images/icon-512x512.png', // パスを修正
-  'Build/Unity-Meal-Planning-App.loader.js',
-  'Build/Unity-Meal-Planning-App.framework.js',
-  'Build/Unity-Meal-Planning-App.data',
-  'Build/Unity-Meal-Planning-App.wasm',
+  'Build/Unity-Dietary-Education-Memory-Game.loader.js',
+  'Build/Unity-Dietary-Education-Memory-Game.framework.js',
+  'Build/Unity-Dietary-Education-Memory-Game.data',
+  'Build/Unity-Dietary-Education-Memory-Game.wasm',
   // 必要に応じて他のUnity関連ファイル(TemplateDataなど)やアセットを追加
   // 'TemplateData/style.css',
   // 'TemplateData/favicon.ico',
